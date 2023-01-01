@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url = "mongodb+srv://aziz:aziz@fluctun.tleszsl.mongodb.net/test?retryWrites=true&w=majority"
+  // url      = "mongodb+srv://aziz:Plenahealth@cluster0.nmlmtau.mongodb.net/fluctun?retryWrites=true&w=majority"
+}
+
+model institute{
+  id String  @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  logo String // image url
+  verified Boolean 
+  students student[]
+  teachers teacher[]
+  createdAt DateTime @default(now())
+  lastUpdatedAt DateTime @default(now())
+}
+
+model student{
+  id String  @id @default(auto()) @map("_id") @db.ObjectId
+  email String
+  password String
+  firstName String
+  lastName String
+  dateOfBirth DateTime?
+  address String?
+  photo String?
+  bio String?
+  questions question[]
+  comments comment[]
+  createdAt DateTime @default(now())
+  lastUpdatedAt DateTime @default(now())
+  // relations
+  institute institute @relation(fields: [instituteId],references: [id])
+  instituteId String @db.ObjectId
+}
+
+model teacher{
+  id String  @id @default(auto()) @map("_id") @db.ObjectId
+  email String
+  password String
+  firstName String
+  lastName String
+  subject String // speciality
+  isAdmin Boolean @default(false)
+  photo String?
+  answers answer[]
+  comments comment[]
+  createdAt DateTime @default(now())
+  lastUpdatedAt DateTime @default(now())
+  // relations
+  institute institute @relation(fields: [instituteId],references: [id])
+  instituteId String @db.ObjectId
+}
+
+model question{
+  id String  @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  details String
+  subject String
+  answers answer[]
+  comments comment[]
+  createdAt DateTime @default(now())
+  lastUpdatedAt DateTime @default(now())
+  // --------- relations ----------
+  // student
+  student student @relation(fields: [studentId],references: [id])
+  studentId String @db.ObjectId
+}
+
+model answer{
+  id String  @id @default(auto()) @map("_id") @db.ObjectId
+  details String
+  comments comment[]
+  createdAt DateTime @default(now())
+  lastUpdatedAt DateTime @default(now())
+  // --------- relations ----------
+  // question
+  question question @relation(fields: [questionId],references: [id])
+  questionId String @db.ObjectId
+  // teacher 
+  teacher teacher @relation(fields: [teacherId],references: [id])
+  teacherId String @db.ObjectId
+}
+
+model comment{
+  id String  @id @default(auto()) @map("_id") @db.ObjectId
+  text String
+  createdAt DateTime @default(now())
+  lastUpdatedAt DateTime @default(now())
+  // ----------- relations ------------
+  // question
+  question question @relation(fields: [questionId],references: [id])
+  questionId String @db.ObjectId
+  // answer 
+  answer answer @relation(fields: [answerId],references: [id])
+  answerId String @db.ObjectId
+  // student
+  student student @relation(fields: [studentId],references: [id])
+  studentId String @db.ObjectId
+  // teacher
+  teacher teacher @relation(fields: [teacherId],references: [id])
+  teacherId String @db.ObjectId
+}
