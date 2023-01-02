@@ -13,15 +13,29 @@ model institute{
   name String
   logo String // image url
   verified Boolean 
+  admin Admin?  
   students student[]
   teachers teacher[]
   createdAt DateTime @default(now())
   lastUpdatedAt DateTime @default(now())
 }
 
+model Admin{
+  id String  @id @default(auto()) @map("_id") @db.ObjectId
+  firstName String
+  lastName String
+  email String @unique
+  password String
+  createdAt DateTime @default(now())
+  lastUpdatedAt DateTime @default(now())
+  // relations
+  institute institute @relation(fields: [instituteId],references: [id])
+  instituteId String @db.ObjectId @unique
+}
+
 model student{
   id String  @id @default(auto()) @map("_id") @db.ObjectId
-  email String
+  email String @unique
   password String
   firstName String
   lastName String
@@ -40,7 +54,7 @@ model student{
 
 model teacher{
   id String  @id @default(auto()) @map("_id") @db.ObjectId
-  email String
+  email String @unique
   password String
   firstName String
   lastName String
