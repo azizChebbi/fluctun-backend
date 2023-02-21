@@ -11,6 +11,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   // the validate function automatically attach the returned user to the request: req.user
   async validate(email: string, password: string): Promise<any> {
     const user = await this.authService.validateUser(email, password);
+    console.log(user);
     if (!user) {
       throw new UnauthorizedException();
     }

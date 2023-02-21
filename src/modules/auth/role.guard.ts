@@ -1,7 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Observable } from 'rxjs';
 
-export type Role = 'student' | 'admin' | 'teacher' | 'super-admin';
+export type Role = 'student' | 'teacher' | 'super-admin';
 
 @Injectable()
 export class RoleGuard implements CanActivate {

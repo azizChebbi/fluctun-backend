@@ -4,8 +4,7 @@ generator client {
 
 datasource db {
   provider = "mongodb"
-  url = "mongodb+srv://aziz:aziz@fluctun.tleszsl.mongodb.net/test?retryWrites=true&w=majority"
-  // url      = "mongodb+srv://aziz:Plenahealth@cluster0.nmlmtau.mongodb.net/fluctun?retryWrites=true&w=majority"
+  url ="mongodb+srv://aziz:aziz@fluctun.tleszsl.mongodb.net/test?retryWrites=true&w=majority"
 }
 
 model institute{
@@ -35,12 +34,14 @@ model Admin{
 
 model student{
   id String  @id @default(auto()) @map("_id") @db.ObjectId
+  number String @unique
   email String @unique
+  code String @unique
   password String
   firstName String
   lastName String
   dateOfBirth DateTime?
-  address String?
+  level String
   photo String?
   bio String?
   questions question[]
@@ -55,11 +56,13 @@ model student{
 model teacher{
   id String  @id @default(auto()) @map("_id") @db.ObjectId
   email String @unique
+  cin String @unique
   password String
   firstName String
   lastName String
+  number Int
+  bio String?
   subject String // speciality
-  isAdmin Boolean @default(false)
   photo String?
   answers answer[]
   comments comment[]
