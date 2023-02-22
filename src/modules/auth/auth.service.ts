@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { Admin } from '@prisma/client';
+import { Admin, student, teacher } from '@prisma/client';
 import { Response } from 'express';
 import { PrismaService } from '../prisma/prisma.service';
 import { jwtConstants } from './constants';
@@ -21,6 +21,9 @@ import * as bcrypt from 'bcrypt';
 import base64url from 'base64url';
 import * as generator from 'generate-password';
 import { SendEmailDto } from './dto/sendEmail.dto';
+import { Role } from './role.guard';
+import { EmailService } from '../email/email.service';
+import { VerifyResetDto } from './dto/verifyReset.dto';
 
 @Injectable()
 export class AuthService {
@@ -28,6 +31,7 @@ export class AuthService {
     @Inject(JwtService) private jwtService: JwtService,
     @Inject(PrismaService) private prisma: PrismaService,
     @Inject(ConfigService) private configService: ConfigService,
+    @Inject(EmailService) private emailService: EmailService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
@@ -483,19 +487,7 @@ export class AuthService {
     });
 
     if (user) {
-      const secret = jwtConstants.reset_secret_key + user.password;
-      const payload = {
-        email,
-        id: user.id,
-      };
-      const token = this.jwtService.sign(payload, {
-        secret,
-        expiresIn: 400,
-      });
-      const encodedUrl = base64url(JSON.stringify(token));
-      const link = `http://localhost:3000/reset-password/${user.id}/${encodedUrl}`;
-      console.log(link);
-      return link;
+      return this.generateResetEmailToken(user, 'student');
     }
     //else
     user = await this.prisma.teacher.findUnique({
@@ -508,10 +500,9 @@ export class AuthService {
         password: true,
       },
     });
-    if (user) {
-      // work to be done
 
-      return user;
+    if (user) {
+      return this.generateResetEmailToken(user, 'teacher');
     }
 
     throw new UnauthorizedException('Email not found');
@@ -527,11 +518,74 @@ export class AuthService {
     }
   }
 
+  async verifyRestPasswordIdAndToken(dto: VerifyResetDto) {
+    const { id, token } = dto;
+    let encodedToken;
+    try {
+      encodedToken = JSON.parse(base64url.decode(token));
+      console.log(encodedToken);
+    } catch (error) {
+      throw new UnauthorizedException('token is invalid');
+    }
+    let user: student | teacher;
+    user = await this.prisma.teacher.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (user) {
+      // check credentails
+      const secret = jwtConstants.reset_secret_key + user.password;
+      try {
+        const payload = this.jwtService.verify(encodedToken, { secret });
+        return payload;
+      } catch (error) {
+        throw new UnauthorizedException('token or id are invalid: teacher');
+      }
+    }
+
+    user = await this.prisma.student.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (user) {
+      const secret = jwtConstants.reset_secret_key + user.password;
+      try {
+        const payload = this.jwtService.verify(encodedToken, { secret });
+        return payload;
+      } catch (error) {
+        throw new UnauthorizedException('token or id are invalid: student');
+      }
+    }
+
+    throw new UnauthorizedException();
+  }
+
   async hashPassword(passwordInPlaintext: string) {
     return await bcrypt.hash(passwordInPlaintext, 10);
   }
 
   async comparePassword(passwordInPlainText: string, hashedPassword: string) {
     return await bcrypt.compare(passwordInPlainText, hashedPassword);
+  }
+
+  async generateResetEmailToken(user: student | teacher, role: Role) {
+    const secret = jwtConstants.reset_secret_key + user.password;
+    const payload = {
+      id: user.id,
+      email: user.email,
+      role,
+    };
+    const token = this.jwtService.sign(payload, {
+      secret,
+      expiresIn: 3600,
+    });
+    const encodedUrl = base64url(JSON.stringify(token));
+    console.log(encodedUrl);
+    const link = `http://localhost:3000/reset-password/${user.id}/${encodedUrl}`;
+    // console.log(this.emailService.sendEmail);
+    return await this.emailService.sendEmail(user.email, link);
+    // return link;
   }
 }

@@ -19,6 +19,7 @@ import { RegisterAdmindto } from './dto/registerAdmin.dto';
 import { RegisterStudentDto } from './dto/registerStudent.dto';
 import { RegisterTeacherDto } from './dto/registerTeacher.dto';
 import { SendEmailDto } from './dto/sendEmail.dto';
+import { VerifyResetDto } from './dto/verifyReset.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { RoleGuard } from './role.guard';
 
@@ -94,5 +95,12 @@ export class AuthController {
     registerTeachersDto: RegisterTeacherDto[],
   ) {
     return this.authService.registerTeachers(registerTeachersDto);
+  }
+
+  @Post('verify-reset')
+  async verifyRestPasswordIdAndToken(
+    @Body(new ValidationPipe()) dto: VerifyResetDto,
+  ) {
+    return this.authService.verifyRestPasswordIdAndToken(dto);
   }
 }
