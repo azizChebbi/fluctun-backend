@@ -5,6 +5,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { AdminModule } from '../admin/admin.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
@@ -12,8 +14,20 @@ import { AdminModule } from '../admin/admin.module';
     AuthModule,
     AdminModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    MailerModule.forRoot({
+      transport: {
+        host: 'smtp.sendgrid.net',
+        auth: {
+          user: 'apikey',
+          pass: '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',
+        },
+      },
+    }),
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
+
+//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
