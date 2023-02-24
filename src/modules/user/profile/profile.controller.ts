@@ -1,12 +1,28 @@
-import { Body, Controller, Put, UseGuards, Request } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Put,
+  UseGuards,
+  Request,
+  Get,
+  Req,
+} from '@nestjs/common';
+import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
 import { RoleGuard } from 'src/modules/auth/role.guard';
 import { EditStudentProfileDto } from './dto/editStudentProfile.dto';
 import { EditTeacherProfileDto } from './dto/editTeacherProfile.dto';
 import { ProfileService } from './profile.service';
 
 @Controller('profile')
+@UseGuards(JwtAuthGuard)
 export class ProfileController {
   constructor(private profileService: ProfileService) {}
+
+  @UseGuards(new RoleGuard(['student', 'teacher']))
+  @Get('')
+  async getUserProfile(@Req() req) {
+    return this.profileService.getProfileData(req);
+  }
 
   @UseGuards(new RoleGuard('student'))
   @Put('student')

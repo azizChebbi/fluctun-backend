@@ -18,6 +18,7 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterAdmindto } from './dto/registerAdmin.dto';
 import { RegisterStudentDto } from './dto/registerStudent.dto';
 import { RegisterTeacherDto } from './dto/registerTeacher.dto';
+import { ResetPasswordDto } from './dto/resetPassword.dto';
 import { SendEmailDto } from './dto/sendEmail.dto';
 import { VerifyResetDto } from './dto/verifyReset.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -102,5 +103,10 @@ export class AuthController {
     @Body(new ValidationPipe()) dto: VerifyResetDto,
   ) {
     return this.authService.verifyRestPasswordIdAndToken(dto);
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Body(new ValidationPipe()) dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto);
   }
 }

@@ -11,11 +11,12 @@ export class EmailService {
         to: 'azizchebbi106@gmail.com',
         from: 'fluctun@gmail.com',
         subject: 'Reset password link',
-        text,
+        text: 'hello',
       });
       console.log(d);
       return `email is sent to ${email} successfully`;
     } catch (error) {
+      console.log(error);
       return 'Email error: ' + error;
     }
   }

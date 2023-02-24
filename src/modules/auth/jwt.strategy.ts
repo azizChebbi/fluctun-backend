@@ -29,6 +29,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: Payload) {
+    console.log('we have entered this validation: ', payload);
     const role = payload.role;
     if (role != 'super-admin' && role != 'student' && role != 'teacher') {
       throw new UnauthorizedException();
@@ -36,33 +37,40 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     let user;
     if (role == 'super-admin') {
       try {
-        await this.prisma.admin.findUnique({
+        user = await this.prisma.admin.findUnique({
           where: {
             id: payload.id,
           },
         });
         if (!user) throw new UnauthorizedException();
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+        throw new UnauthorizedException();
+      }
     }
     if (role == 'student') {
       try {
-        await this.prisma.student.findUnique({
+        user = await this.prisma.student.findUnique({
           where: {
             id: payload.id,
           },
         });
         if (!user) throw new UnauthorizedException();
-      } catch (error) {}
+      } catch (error) {
+        throw new UnauthorizedException();
+      }
     }
     if (role == 'teacher') {
       try {
-        await this.prisma.admin.findUnique({
+        user = await this.prisma.teacher.findUnique({
           where: {
             id: payload.id,
           },
         });
         if (!user) throw new UnauthorizedException();
-      } catch (error) {}
+      } catch (error) {
+        throw new UnauthorizedException();
+      }
     }
 
     return {

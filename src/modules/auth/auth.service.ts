@@ -24,6 +24,7 @@ import { SendEmailDto } from './dto/sendEmail.dto';
 import { Role } from './role.guard';
 import { EmailService } from '../email/email.service';
 import { VerifyResetDto } from './dto/verifyReset.dto';
+import { ResetPasswordDto } from './dto/resetPassword.dto';
 
 @Injectable()
 export class AuthService {
@@ -42,8 +43,12 @@ export class AuthService {
         email,
       },
     });
-    let isPasswordMatching = await this.comparePassword(pass, user.password);
-    if (user && isPasswordMatching) {
+    if (user) {
+      const isPasswordMatching = await this.comparePassword(
+        pass,
+        user.password,
+      );
+      if (!isPasswordMatching) throw new UnauthorizedException();
       const { password, ...result } = user;
       return { ...result, role: 'student', instituteId: user.instituteId };
     }
@@ -54,8 +59,12 @@ export class AuthService {
         email,
       },
     });
-    isPasswordMatching = await this.comparePassword(pass, user.password);
-    if (user && isPasswordMatching) {
+    if (user) {
+      const isPasswordMatching = await this.comparePassword(
+        pass,
+        user.password,
+      );
+      if (!isPasswordMatching) throw new UnauthorizedException();
       const { password, ...result } = user;
       return { ...result, role: 'teacher', instituteId: user.instituteId };
     }
@@ -454,14 +463,12 @@ export class AuthService {
           throw new UnauthorizedException();
         }
       }
-      const at = this.jwtService.sign(
-        {
-          userId: validated.id,
-          role: validated.role,
-          instituteId: validated.instituteId,
-        },
-        { secret: jwtConstants.secret, expiresIn: '600' },
-      );
+      const payload = {
+        id: validated.id,
+        role: validated.role,
+        instituteId: validated.instituteId,
+      };
+      const at = this.jwtService.sign(payload);
       return {
         access_token: at,
       };
@@ -562,6 +569,73 @@ export class AuthService {
     throw new UnauthorizedException();
   }
 
+  async resetPassword(dto: ResetPasswordDto) {
+    const { id, token, password, passwordConfirmation } = dto;
+    try {
+      await this.verifyRestPasswordIdAndToken({ id, token });
+    } catch (error) {
+      throw new UnauthorizedException('id or token are invalid');
+    }
+
+    if (password != passwordConfirmation)
+      throw new HttpException('passwords must match', HttpStatus.BAD_REQUEST);
+
+    let user: teacher | student;
+    user = await this.prisma.teacher.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    // if user is a teacher
+    if (user) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const isPasswordMatching = await bcrypt.compare(password, user.password);
+      if (isPasswordMatching) {
+        throw new HttpException(
+          'new password should not be equal to old password',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      return await this.prisma.teacher.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          password: hashedPassword,
+        },
+      });
+    }
+
+    user = await this.prisma.student.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    // if user is a student
+    if (user) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const isPasswordMatching = await bcrypt.compare(password, user.password);
+      if (isPasswordMatching) {
+        throw new HttpException(
+          'new password should not be equal to old password',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      return await this.prisma.student.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          password: hashedPassword,
+        },
+      });
+    }
+
+    throw new UnauthorizedException('user not found');
+  }
+
   async hashPassword(passwordInPlaintext: string) {
     return await bcrypt.hash(passwordInPlaintext, 10);
   }
@@ -582,10 +656,11 @@ export class AuthService {
       expiresIn: 3600,
     });
     const encodedUrl = base64url(JSON.stringify(token));
-    console.log(encodedUrl);
     const link = `http://localhost:3000/reset-password/${user.id}/${encodedUrl}`;
+    console.log(link);
     // console.log(this.emailService.sendEmail);
-    return await this.emailService.sendEmail(user.email, link);
+    return link;
+    // return await this.emailService.sendEmail(user.email, link);
     // return link;
   }
 }
