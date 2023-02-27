@@ -1,10 +1,13 @@
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, Length, MaxLength, MinLength } from 'class-validator';
 
 export class AddQuestionDto {
   @IsNotEmpty()
-  title: string;
+  @MinLength(5)
+  @MaxLength(150)
+  question: string;
   @IsNotEmpty()
-  details: string;
+  @MinLength(20)
+  description: string;
   @IsNotEmpty()
   subject: string;
 }

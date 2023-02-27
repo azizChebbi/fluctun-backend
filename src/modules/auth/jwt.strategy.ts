@@ -29,7 +29,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: Payload) {
-    console.log('we have entered this validation: ', payload);
+    // console.log('we have entered this validation: ', payload);
     const role = payload.role;
     if (role != 'super-admin' && role != 'student' && role != 'teacher') {
       throw new UnauthorizedException();

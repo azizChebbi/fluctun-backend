@@ -10,8 +10,8 @@ export class AdminService {
   async getTeachers() {
     const teachers = await this.prisma.teacher.findMany({});
     return teachers.map((teacher) => {
-      const { password, ...t } = teacher;
-      return t;
+      delete teacher.password;
+      return teacher;
     });
   }
 
@@ -22,8 +22,8 @@ export class AdminService {
   async getStudents() {
     const students = await this.prisma.student.findMany({});
     return students.map((student) => {
-      const { password, ...s } = student;
-      return s;
+      delete student.password;
+      return student;
     });
   }
   async deleteStudents() {

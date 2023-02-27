@@ -34,7 +34,6 @@ model Admin{
 
 model student{
   id String  @id @default(auto()) @map("_id") @db.ObjectId
-  number String @unique
   email String @unique
   code String @unique
   password String
@@ -75,8 +74,8 @@ model teacher{
 
 model question{
   id String  @id @default(auto()) @map("_id") @db.ObjectId
-  title String
-  details String
+  question String
+  description String
   subject String
   answers answer[]
   comments comment[]

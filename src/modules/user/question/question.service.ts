@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ObjectId } from 'mongodb';
-import { stringify } from 'querystring';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AddAnswerDto } from './dto/addAnswer.dto';
 import { AddQuestionDto } from './dto/addQuestion.dto';
@@ -10,11 +8,10 @@ export class QuestionService {
   constructor(private prisma: PrismaService) {}
 
   async addQuestion(addQuestionDto: AddQuestionDto, id: string): Promise<any> {
-    const ID: string = new ObjectId().toString();
     return await this.prisma.question.create({
       data: {
         ...addQuestionDto,
-        studentId: ID,
+        studentId: id,
       },
     });
   }
@@ -65,5 +62,9 @@ export class QuestionService {
 
   async getQuestions() {
     return await this.prisma.question.findMany();
+  }
+
+  async uploadImage() {
+    return null;
   }
 }
