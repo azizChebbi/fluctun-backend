@@ -1,11 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AddAnswerDto } from './dto/addAnswer.dto';
 import { AddQuestionDto } from './dto/addQuestion.dto';
+import { Express } from 'express';
+import { AwsService } from 'src/modules/aws/aws.service';
 
 @Injectable()
 export class QuestionService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    @Inject(PrismaService) private prisma: PrismaService,
+    @Inject(AwsService) private awsService: AwsService,
+  ) {}
 
   async addQuestion(addQuestionDto: AddQuestionDto, id: string): Promise<any> {
     return await this.prisma.question.create({
@@ -64,7 +69,7 @@ export class QuestionService {
     return await this.prisma.question.findMany();
   }
 
-  async uploadImage() {
-    return null;
+  async uploadImage(file: Express.Multer.File) {
+    return await this.awsService.upload(file);
   }
 }

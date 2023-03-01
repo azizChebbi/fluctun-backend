@@ -54,6 +54,6 @@ export class QuestionController {
   @UseInterceptors(FileInterceptor('image'))
   async uploadImage(@UploadedFile() file: Express.Multer.File) {
     console.log(file);
-    return this.questionService.uploadImage();
+    return this.questionService.uploadImage(file);
   }
 }

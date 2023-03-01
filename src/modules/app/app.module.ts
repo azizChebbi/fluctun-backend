@@ -8,6 +8,8 @@ import { AdminModule } from '../admin/admin.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailModule } from '../email/email.module';
 import { ProfileModule } from '../user/profile/profile.module';
+import { AwsService } from '../aws/aws.service';
+import { AwsModule } from '../aws/aws.module';
 
 @Module({
   imports: [
@@ -26,6 +28,7 @@ import { ProfileModule } from '../user/profile/profile.module';
     }),
     EmailModule,
     ProfileModule,
+    AwsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
