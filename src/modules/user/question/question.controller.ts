@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -18,6 +19,7 @@ import { AddQuestionDto } from './dto/addQuestion.dto';
 import { QuestionService } from './question.service';
 import { Express } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { QuestionQueryParams } from './types';
 
 @UseGuards(JwtAuthGuard)
 @Controller('questions')
@@ -46,8 +48,8 @@ export class QuestionController {
   }
 
   @Get()
-  async getQuestions() {
-    return this.questionService.getQuestions();
+  async getQuestions(@Query() query: QuestionQueryParams) {
+    return this.questionService.getQuestions(query);
   }
 
   @Post('upload-image')

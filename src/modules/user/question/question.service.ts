@@ -4,6 +4,7 @@ import { AddAnswerDto } from './dto/addAnswer.dto';
 import { AddQuestionDto } from './dto/addQuestion.dto';
 import { Express } from 'express';
 import { AwsService } from 'src/modules/aws/aws.service';
+import { QuestionQueryParams } from './types';
 
 @Injectable()
 export class QuestionService {
@@ -65,8 +66,45 @@ export class QuestionService {
     });
   }
 
-  async getQuestions() {
-    return await this.prisma.question.findMany();
+  async getQuestions(query: QuestionQueryParams) {
+    return await this.prisma.question.findMany({
+      where: {
+        ...(query.type === 'answered' && {
+          answers: {
+            some: {
+              id: {
+                not: undefined,
+              },
+            },
+          },
+        }),
+        ...(query.type === 'unanswered' && {
+          answers: {
+            every: {
+              id: undefined,
+            },
+          },
+        }),
+        ...(query.subjects && {
+          subject: {
+            in: query.subjects,
+          },
+        }),
+        ...(query.startDate && {
+          createdAt: {
+            gte: new Date(query.startDate),
+          },
+        }),
+        ...(query.endDate && {
+          createdAt: {
+            lte: new Date(query.endDate),
+          },
+        }),
+      },
+      orderBy: {
+        createdAt: query.dateOrder || 'desc',
+      },
+    });
   }
 
   async uploadImage(file: Express.Multer.File) {
