@@ -1,3 +1,5 @@
 export class EditTeacherProfileDto {
-  photo: string;
+  dateOfBirth: Date;
+  bio: string;
+  address: string;
 }

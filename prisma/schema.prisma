@@ -43,6 +43,8 @@ model student{
   level String
   photo String?
   bio String?
+  address String?
+  number Int?
   questions question[]
   comments comment[]
   createdAt DateTime @default(now())
@@ -60,9 +62,11 @@ model teacher{
   firstName String
   lastName String
   number Int
+  dateOfBirth DateTime?
   bio String?
   subject String // speciality
   photo String?
+  address String?
   answers answer[]
   comments comment[]
   createdAt DateTime @default(now())
@@ -89,7 +93,7 @@ model question{
 
 model answer{
   id String  @id @default(auto()) @map("_id") @db.ObjectId
-  details String
+  description String
   comments comment[]
   createdAt DateTime @default(now())
   lastUpdatedAt DateTime @default(now())
@@ -109,15 +113,24 @@ model comment{
   lastUpdatedAt DateTime @default(now())
   // ----------- relations ------------
   // question
-  question question @relation(fields: [questionId],references: [id])
-  questionId String @db.ObjectId
+  question question? @relation(fields: [questionId],references: [id])
+  questionId String? @db.ObjectId
   // answer 
-  answer answer @relation(fields: [answerId],references: [id])
-  answerId String @db.ObjectId
+  answer answer? @relation(fields: [answerId],references: [id])
+  answerId String? @db.ObjectId
   // student
-  student student @relation(fields: [studentId],references: [id])
-  studentId String @db.ObjectId
+  student student? @relation(fields: [studentId],references: [id])
+  studentId String? @db.ObjectId
   // teacher
-  teacher teacher @relation(fields: [teacherId],references: [id])
-  teacherId String @db.ObjectId
+  teacher teacher? @relation(fields: [teacherId],references: [id])
+  teacherId String? @db.ObjectId
+}
+
+model notification{
+  id String  @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  description String
+  link String
+  createdAt DateTime @default(now())
+  lastUpdatedAt DateTime @default(now())
 }

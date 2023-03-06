@@ -42,10 +42,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             id: payload.id,
           },
         });
-        if (!user) throw new UnauthorizedException();
+        if (!user) throw new UnauthorizedException('bitttch');
       } catch (error) {
         console.log(error);
-        throw new UnauthorizedException();
+        throw new UnauthorizedException('bitttch');
       }
     }
     if (role == 'student') {
@@ -55,9 +55,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             id: payload.id,
           },
         });
-        if (!user) throw new UnauthorizedException();
+        if (!user) throw new UnauthorizedException('biiitch');
       } catch (error) {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException('bitttch');
       }
     }
     if (role == 'teacher') {
@@ -67,9 +67,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             id: payload.id,
           },
         });
-        if (!user) throw new UnauthorizedException();
+        if (!user) throw new UnauthorizedException('bitttch');
       } catch (error) {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException('bitttch');
       }
     }
 

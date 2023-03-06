@@ -20,6 +20,8 @@ import { QuestionService } from './question.service';
 import { Express } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { QuestionQueryParams } from './types';
+import { ObjectId } from 'mongodb';
+import { AddCommentDto } from './dto/addComment.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('questions')
@@ -48,8 +50,13 @@ export class QuestionController {
   }
 
   @Get()
-  async getQuestions(@Query() query: QuestionQueryParams) {
-    return this.questionService.getQuestions(query);
+  async getQuestions(@Query() query: QuestionQueryParams, @Req() req) {
+    return this.questionService.getQuestions(query, req.user);
+  }
+
+  @Post('/comment')
+  async addComment(@Body(new ValidationPipe()) addCommentDto: AddCommentDto) {
+    return this.questionService.addComment(addCommentDto);
   }
 
   @Post('upload-image')
