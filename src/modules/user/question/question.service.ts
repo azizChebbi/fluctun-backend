@@ -8,6 +8,8 @@ import { ObjectId } from 'mongodb';
 import { AddCommentDto } from './dto/addComment.dto';
 import { Types } from 'mongoose';
 import { Payload } from 'src/modules/auth/jwt.strategy';
+import { EditQuestionDto } from './dto/editQuestion.dto';
+import { EditAnswerDto } from './dto/editAnswer.dto';
 
 @Injectable()
 export class QuestionService {
@@ -34,10 +36,17 @@ export class QuestionService {
     });
   }
 
+  async getAnswer(answerId: string) {
+    return await this.prisma.answer.findUnique({
+      where: {
+        id: answerId,
+      },
+    });
+  }
+
   async getQuestion(questionId: string) {
-    console.log(questionId);
     try {
-      return await this.prisma.question.findUnique({
+      const question = await this.prisma.question.findUnique({
         where: {
           id: questionId,
         },
@@ -96,9 +105,51 @@ export class QuestionService {
           },
         },
       });
+      if (!question) {
+        throw new HttpException('Question not found', 404);
+      }
+      return question;
     } catch (e) {
       throw new HttpException(e, 500);
     }
+  }
+
+  async editQuestion(dto: EditQuestionDto, id: string) {
+    return await this.prisma.question.update({
+      where: {
+        id,
+      },
+      data: {
+        ...dto,
+      },
+    });
+  }
+
+  async deleteQuestion(id: string) {
+    return await this.prisma.question.delete({
+      where: {
+        id,
+      },
+    });
+  }
+
+  async deleteAnswer(id: string) {
+    return await this.prisma.answer.delete({
+      where: {
+        id,
+      },
+    });
+  }
+
+  async editAnswer(dto: EditAnswerDto, id: string) {
+    return await this.prisma.answer.update({
+      where: {
+        id,
+      },
+      data: {
+        ...dto,
+      },
+    });
   }
 
   async getQuestions(query: QuestionQueryParams, user: Payload) {
@@ -206,6 +257,14 @@ export class QuestionService {
 
     return await this.prisma.comment.create({
       data: dto,
+    });
+  }
+
+  async deleteComment(id: string) {
+    return await this.prisma.comment.delete({
+      where: {
+        id,
+      },
     });
   }
 

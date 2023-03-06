@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
+  Put,
   Query,
   Req,
   UploadedFile,
@@ -20,8 +22,8 @@ import { QuestionService } from './question.service';
 import { Express } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { QuestionQueryParams } from './types';
-import { ObjectId } from 'mongodb';
 import { AddCommentDto } from './dto/addComment.dto';
+import { EditAnswerDto } from './dto/editAnswer.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('questions')
@@ -38,27 +40,73 @@ export class QuestionController {
     return this.questionService.addQuestion(addQuestionDto, req.user.id);
   }
 
+  @UseGuards(new RoleGuard('student'))
+  @Put(':id')
+  async editQuestion(
+    @Param('id') id: string,
+    @Body(new ValidationPipe()) addQuestionDto: AddQuestionDto,
+  ) {
+    return this.questionService.editQuestion(addQuestionDto, id);
+  }
+
   @UseGuards(new RoleGuard('teacher'))
   @Post('answer')
   async addAnswer(@Body() addAnswerDto: AddAnswerDto, @Req() req) {
     return this.questionService.addAnswer(addAnswerDto, req.user.id);
   }
 
+  @UseGuards(new RoleGuard('teacher'))
+  @Delete('/answer')
+  async deleteAnswer(@Query() query: { id: string }) {
+    return this.questionService.deleteAnswer(query.id);
+  }
+
+  @UseGuards(new RoleGuard('student'))
+  @Delete('/question')
+  async deleteQuestion(@Query() query: { id: string }) {
+    return this.questionService.deleteQuestion(query.id);
+  }
+
+  @UseGuards(new RoleGuard(['student', 'teacher']))
   @Get(':id')
   async getQuestion(@Param('id') id: string) {
     return this.questionService.getQuestion(id);
   }
 
+  @UseGuards(new RoleGuard('teacher'))
+  @Get('answers/:id')
+  async getAnswer(@Param('id') id: string) {
+    return this.questionService.getAnswer(id);
+  }
+
+  @UseGuards(new RoleGuard('teacher'))
+  @Put('answers/:id')
+  async editAnswer(
+    @Param('id') id: string,
+    @Body(new ValidationPipe()) dto: EditAnswerDto,
+  ) {
+    return this.questionService.editAnswer(dto, id);
+  }
+
+  @UseGuards(new RoleGuard(['student', 'teacher', 'super-admin']))
   @Get()
   async getQuestions(@Query() query: QuestionQueryParams, @Req() req) {
     return this.questionService.getQuestions(query, req.user);
   }
 
+  @UseGuards(new RoleGuard(['student', 'teacher']))
   @Post('/comment')
   async addComment(@Body(new ValidationPipe()) addCommentDto: AddCommentDto) {
     return this.questionService.addComment(addCommentDto);
   }
 
+  @UseGuards(new RoleGuard(['student', 'teacher']))
+  @Delete('/comment')
+  async deleteComment(@Query() query: { id: string }) {
+    return this.questionService.deleteComment(query.id);
+  }
+
+  @UseGuards(new RoleGuard(['student', 'teacher']))
   @Post('upload-image')
   @UseInterceptors(FileInterceptor('image'))
   async uploadImage(@UploadedFile() file: Express.Multer.File) {
