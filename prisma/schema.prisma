@@ -12,11 +12,36 @@ model institute{
   name String
   logo String // image url
   verified Boolean 
-  admin Admin?  
-  students student[]
-  teachers teacher[]
+  nbMonths Int @default(0)
   createdAt DateTime @default(now())
   lastUpdatedAt DateTime @default(now())
+
+  // relations
+  admin Admin?  
+  subjects courseSubject[]
+  students student[]
+  teachers teacher[]
+}
+
+model courseSubject{
+  id String  @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  createdAt DateTime @default(now())
+  lastUpdatedAt DateTime @default(now())
+  // relations
+  institute institute @relation(fields: [instituteId],references: [id])
+  instituteId String @db.ObjectId
+  chapters subjectChapter[]
+}
+
+model subjectChapter{
+  id String  @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  createdAt DateTime @default(now())
+  lastUpdatedAt DateTime @default(now())
+  // relations
+  subject courseSubject @relation(fields: [subjectId],references: [id])
+  subjectId String @db.ObjectId
 }
 
 model Admin{

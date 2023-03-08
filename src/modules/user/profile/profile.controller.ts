@@ -53,7 +53,7 @@ export class ProfileController {
   @UseGuards(new RoleGuard('teacher'))
   @Put('teacher')
   async editTeacherProfile(
-    editTeacherProfileDto: EditTeacherProfileDto,
+    @Body() editTeacherProfileDto: EditTeacherProfileDto,
     @Request() req,
   ) {
     return this.profileService.editTeacherProfile(

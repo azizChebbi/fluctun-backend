@@ -90,14 +90,13 @@ export class ProfileService {
   async updateImage(req: any, file: Express.Multer.File) {
     const { id, role } = req.user;
     const res = await this.awsService.upload(file);
-    console.log('res', res);
     if (role == 'teacher')
       await this.prisma.teacher.update({
         where: {
           id,
         },
         data: {
-          photo: res.location,
+          photo: res.Location,
         },
       });
     else if (role == 'student') {

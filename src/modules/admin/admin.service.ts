@@ -8,7 +8,20 @@ export class AdminService {
   constructor(private prisma: PrismaService) {}
 
   async getTeachers() {
-    const teachers = await this.prisma.teacher.findMany({});
+    const teachers = await this.prisma.teacher.findMany({
+      // include question ids from answers
+      include: {
+        answers: {
+          select: {
+            question: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+      },
+    });
     return teachers.map((teacher) => {
       delete teacher.password;
       return teacher;
@@ -20,7 +33,15 @@ export class AdminService {
   }
 
   async getStudents() {
-    const students = await this.prisma.student.findMany({});
+    const students = await this.prisma.student.findMany({
+      include: {
+        questions: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
     return students.map((student) => {
       delete student.password;
       return student;
