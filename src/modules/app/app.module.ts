@@ -10,12 +10,14 @@ import { EmailModule } from '../email/email.module';
 import { ProfileModule } from '../user/profile/profile.module';
 import { AwsService } from '../aws/aws.service';
 import { AwsModule } from '../aws/aws.module';
+import { DocumentsModule } from '../user/documents/documents.module';
 
 @Module({
   imports: [
     QuestionModule,
     AuthModule,
     AdminModule,
+    DocumentsModule,
     ConfigModule.forRoot({ isGlobal: true }),
     MailerModule.forRoot({
       transport: {

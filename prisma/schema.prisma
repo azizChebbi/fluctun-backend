@@ -18,31 +18,24 @@ model institute{
 
   // relations
   admin Admin?  
-  subjects courseSubject[]
   students student[]
   teachers teacher[]
 }
 
-model courseSubject{
+model document{
   id String  @id @default(auto()) @map("_id") @db.ObjectId
-  name String
+  title String 
+  url String
+  type String?
+  size Int?
+  levels String[]
   createdAt DateTime @default(now())
   lastUpdatedAt DateTime @default(now())
   // relations
-  institute institute @relation(fields: [instituteId],references: [id])
-  instituteId String @db.ObjectId
-  chapters subjectChapter[]
+  teacher teacher @relation(fields: [teacherId],references: [id])
+  teacherId String @db.ObjectId
 }
 
-model subjectChapter{
-  id String  @id @default(auto()) @map("_id") @db.ObjectId
-  name String
-  createdAt DateTime @default(now())
-  lastUpdatedAt DateTime @default(now())
-  // relations
-  subject courseSubject @relation(fields: [subjectId],references: [id])
-  subjectId String @db.ObjectId
-}
 
 model Admin{
   id String  @id @default(auto()) @map("_id") @db.ObjectId
@@ -99,6 +92,7 @@ model teacher{
   // relations
   institute institute @relation(fields: [instituteId],references: [id])
   instituteId String @db.ObjectId
+  documents document[]
 }
 
 model question{
@@ -159,3 +153,4 @@ model notification{
   createdAt DateTime @default(now())
   lastUpdatedAt DateTime @default(now())
 }
+
