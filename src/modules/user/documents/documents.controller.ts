@@ -7,6 +7,7 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
@@ -35,7 +36,7 @@ export class DocumentsController {
   @Post('/add-document')
   @UseInterceptors(FileInterceptor('file'))
   async addDocument(
-    @Body() dto: AddDocumentDto,
+    @Body(new ValidationPipe()) dto: AddDocumentDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
     return this.documentsService.addDocument(dto, file);

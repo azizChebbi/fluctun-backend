@@ -44,6 +44,7 @@ export class DocumentsService {
           ...dto,
           levels: dto.levels.split(','),
           url: uploadedFile.Location,
+          size: parseInt(dto.size, 10),
         },
       });
       return document;
@@ -51,6 +52,5 @@ export class DocumentsService {
       console.log(error);
       throw new HttpException(error, 500);
     }
-    return null;
   }
 }

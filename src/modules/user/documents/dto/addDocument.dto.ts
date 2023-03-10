@@ -1,4 +1,10 @@
-import { IsMongoId, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
+import {
+  IsMongoId,
+  IsNotEmpty,
+  IsOptional,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class AddDocumentDto {
   @IsNotEmpty()
@@ -11,4 +17,8 @@ export class AddDocumentDto {
   @IsNotEmpty()
   @IsMongoId()
   teacherId: string;
+  @IsOptional()
+  size: string;
+  @IsOptional()
+  type: string;
 }
