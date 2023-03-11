@@ -8,10 +8,10 @@ export class EmailService {
   async sendEmail(email: string, text: string) {
     try {
       const d = await this.mailService.sendMail({
-        to: 'azizchebbi106@gmail.com',
+        to: email,
         from: 'fluctun@gmail.com',
         subject: 'Reset password link',
-        text: 'hello',
+        text,
       });
       console.log(d);
       return `email is sent to ${email} successfully`;

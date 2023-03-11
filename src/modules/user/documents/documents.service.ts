@@ -53,4 +53,63 @@ export class DocumentsService {
       throw new HttpException(error, 500);
     }
   }
+
+  async deleteDocument(id: string) {
+    try {
+      const document = await this.prisma.document.delete({
+        where: {
+          id,
+        },
+      });
+      return document;
+    } catch (error) {
+      throw new HttpException(error, 500);
+    }
+  }
+
+  async getTeacherDocuments(teacherId: string) {
+    try {
+      const documents = await this.prisma.document.findMany({
+        where: {
+          teacherId,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+      return documents;
+    } catch (error) {
+      throw new HttpException(error, 500);
+    }
+  }
+
+  async getDocumentsByLevel(id: string) {
+    try {
+      const student = await this.prisma.student.findUnique({
+        where: {
+          id,
+        },
+      });
+      const documents = await this.prisma.document.findMany({
+        where: {
+          levels: {
+            has: student.level,
+          },
+        },
+        include: {
+          teacher: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              subject: true,
+            },
+          },
+        },
+      });
+      return documents;
+    } catch (error) {
+      throw new HttpException(error, 500);
+    }
+  }
 }

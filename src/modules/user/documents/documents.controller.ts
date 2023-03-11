@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Post,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -40,5 +42,24 @@ export class DocumentsController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     return this.documentsService.addDocument(dto, file);
+  }
+
+  @UseGuards(new RoleGuard('teacher'))
+  @Delete()
+  // get the id from query params
+  async deleteDocument(@Query() queries) {
+    return this.documentsService.deleteDocument(queries.id);
+  }
+
+  @UseGuards(new RoleGuard('teacher'))
+  @Get('teacher-documents')
+  async getTeacherDocuments(@Req() req) {
+    return this.documentsService.getTeacherDocuments(req.user.id);
+  }
+
+  @UseGuards(new RoleGuard('student'))
+  @Get('student-documents')
+  async getStudentDocuments(@Req() req) {
+    return this.documentsService.getDocumentsByLevel(req.user.id);
   }
 }

@@ -657,10 +657,6 @@ export class AuthService {
     });
     const encodedUrl = base64url(JSON.stringify(token));
     const link = `http://localhost:3000/reset-password/${user.id}/${encodedUrl}`;
-    console.log(link);
-    // console.log(this.emailService.sendEmail);
-    // return link;
     return await this.emailService.sendEmail(user.email, link);
-    // return link;
   }
 }
