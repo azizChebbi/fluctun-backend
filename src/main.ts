@@ -9,7 +9,13 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
     credentials: true,
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin: [
+      'http://192.168.1.8:3000',
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://192.168.1.101:3000',
+      'http://192.168.1.101:3001',
+    ],
   });
   app.use(cookieParser());
   const config = new DocumentBuilder()

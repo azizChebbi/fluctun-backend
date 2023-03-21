@@ -6,7 +6,7 @@ export class AddQuestionDto {
   @MaxLength(150)
   question: string;
   @IsNotEmpty()
-  @MinLength(20)
+  @MinLength(10)
   description: string;
   @IsNotEmpty()
   subject: string;

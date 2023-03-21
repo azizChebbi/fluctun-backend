@@ -37,6 +37,7 @@ export class AuthService {
 
   async validateUser(email: string, pass: string): Promise<any> {
     let user;
+    email = email.toLowerCase();
     // check if user is a student
     user = await this.prisma.student.findUnique({
       where: {
@@ -278,6 +279,11 @@ export class AuthService {
           numbers: true,
         });
         const hashedPassword = await bcrypt.hash(password, 10);
+        await this.emailService.sendEmail(
+          'Password',
+          s.email,
+          'Votre mot de passe est: ' + password,
+        );
         return {
           ...s,
           password: hashedPassword,
@@ -285,9 +291,11 @@ export class AuthService {
       }),
     );
 
-    return this.prisma.student.createMany({
-      data: studentsArray,
-    });
+    try {
+      return this.prisma.student.createMany({
+        data: studentsArray,
+      });
+    } catch (error) {}
   }
 
   async registerTeachers(registerTeachersDto: RegisterTeacherDto[]) {
@@ -399,7 +407,11 @@ export class AuthService {
           length: 10,
           numbers: true,
         });
-        console.log(password);
+        await this.emailService.sendEmail(
+          'Password',
+          t.email,
+          'Votre mot de passe est: ' + password,
+        );
         const hashedPassword = await bcrypt.hash(password, 10);
         return {
           ...t,
@@ -657,6 +669,10 @@ export class AuthService {
     });
     const encodedUrl = base64url(JSON.stringify(token));
     const link = `http://localhost:3000/reset-password/${user.id}/${encodedUrl}`;
-    return await this.emailService.sendEmail(user.email, link);
+    return await this.emailService.sendEmail(
+      'Mot de passe oublié',
+      user.email,
+      link,
+    );
   }
 }

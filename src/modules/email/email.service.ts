@@ -5,12 +5,12 @@ import { Injectable } from '@nestjs/common';
 export class EmailService {
   constructor(private mailService: MailerService) {}
 
-  async sendEmail(email: string, text: string) {
+  async sendEmail(subject: string, email: string, text: string) {
     try {
       const d = await this.mailService.sendMail({
         to: email,
         from: 'fluctun@gmail.com',
-        subject: 'Reset password link',
+        subject: subject,
         text,
       });
       console.log(d);

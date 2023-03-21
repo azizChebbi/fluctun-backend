@@ -86,4 +86,58 @@ export class AdminService {
       data,
     });
   }
+
+  // get the number of questions per month startin from september to july
+  async getQuestionsAndAnswersPerMonth(req) {
+    const { instituteId } = req.user;
+    const date = new Date();
+    const month = date.getMonth();
+    let year = date.getFullYear();
+    if (month < 6) year--;
+    const questions = await this.prisma.question.findMany({
+      where: {
+        student: {
+          instituteId,
+        },
+        createdAt: {
+          gte: new Date(year, 8, 1),
+        },
+      },
+    });
+
+    // const answers = await this.prisma.question.findMany({
+    //   where: {
+    //     student: {
+    //       instituteId,
+    //     },
+    //   },
+    // });
+
+    // get the same thing as questions and add group by month
+    // const questionsPerMonth = await this.prisma.question.findMany({
+    //   where: {
+    //     student: {
+    //       instituteId,
+    //     },
+    //     createdAt: {
+    //       gte: new Date(year, 8, 1),
+    //     },
+    //   },
+    //   groupBy: {
+    //     createdAt: {
+    //       by: 'month',
+    //     },
+    //   },
+    // });
+    const answers = await this.prisma.answer.groupBy({
+      by: ['createdAt'],
+      where: {
+        teacher: {
+          instituteId,
+        },
+      },
+    });
+
+    return answers;
+  }
 }

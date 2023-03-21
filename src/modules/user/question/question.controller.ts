@@ -31,6 +31,46 @@ import { EditAnswerDto } from './dto/editAnswer.dto';
 export class QuestionController {
   constructor(private readonly questionService: QuestionService) {}
 
+  @UseGuards(new RoleGuard('super-admin'))
+  @Get('top-students')
+  async getTopStudents(@Req() req) {
+    return this.questionService.getTopStudents(req);
+  }
+
+  // get top teachers
+  @UseGuards(new RoleGuard('super-admin'))
+  @Get('top-teachers')
+  async getTopTeachers(@Req() req) {
+    return this.questionService.getTopTeachers(req);
+  }
+
+  @UseGuards(new RoleGuard('super-admin'))
+  @Get('questionsAndAnswersPerMonth')
+  async getQuestionsAndAnswersPerMonth(@Req() req) {
+    return this.questionService.getQuestionsAndAnswersPerMonth(req);
+  }
+
+  @UseGuards(new RoleGuard('super-admin'))
+  @Get('questionsAndAnswersPerLevel')
+  async getQuestionsAndAnswersPerLevel(@Req() req) {
+    return this.questionService.getQuestionsAndAnswersPerLevel(req);
+  }
+
+  @UseGuards(new RoleGuard('super-admin'))
+  @Get('questionsAndAnswersPerSubject')
+  async getQuestionsAndAnswersPerSubject(@Req() req) {
+    return this.questionService.getQuestionsAndAnswersPerSubject(req);
+  }
+
+  @UseGuards(new RoleGuard('super-admin'))
+  @Get('count')
+  async getQuestionsAndAnswersCountPerPeriod(@Req() req) {
+    return Promise.all([
+      this.questionService.getQuestionsPerPeriod(req),
+      this.questionService.getAnswersPerPeriod(req),
+    ]);
+  }
+
   @UseGuards(new RoleGuard('student'))
   @Post()
   addQuestion(
