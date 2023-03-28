@@ -10,6 +10,7 @@ import { Types } from 'mongoose';
 import { Payload } from 'src/modules/auth/jwt.strategy';
 import { EditQuestionDto } from './dto/editQuestion.dto';
 import { EditAnswerDto } from './dto/editAnswer.dto';
+import { ConfigurationServicePlaceholders } from 'aws-sdk/lib/config_service_placeholders';
 
 @Injectable()
 export class QuestionService {
@@ -165,7 +166,6 @@ export class QuestionService {
       },
     });
 
-    console.log(student, teacher);
     const questions = await this.prisma.question.findMany({
       where: {
         student: {
@@ -200,6 +200,7 @@ export class QuestionService {
             lte: new Date(query.endDate),
           },
         }),
+        // i want to get the answers answered by an array of teachers name, each name consist of first name and last name
       },
       orderBy: {
         createdAt: query.dateOrder || 'desc',
@@ -214,29 +215,39 @@ export class QuestionService {
         answers: {
           select: {
             id: true,
+            teacher: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                photo: true,
+              },
+            },
           },
         },
       },
     });
 
-    const questionsWithAnswered = questions.map((question) => {
+    let questionsNewShape = questions.map((question) => {
       const q = {
         ...question,
         title: question.question,
         answered: question.answers.length > 0,
       };
-      delete q.answers;
       delete q.question;
       return q;
     });
 
     if (query.type) {
-      return questionsWithAnswered.filter(
+      questionsNewShape = questionsNewShape.filter(
         (question) => question.answered === (query.type === 'answered'),
       );
     }
 
-    return questionsWithAnswered;
+    return {
+      questions: questionsNewShape,
+      count: questionsNewShape.length,
+    };
   }
 
   async addComment(dto: AddCommentDto) {

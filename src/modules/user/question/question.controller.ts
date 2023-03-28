@@ -107,7 +107,7 @@ export class QuestionController {
     return this.questionService.deleteQuestion(query.id);
   }
 
-  @UseGuards(new RoleGuard(['student', 'teacher']))
+  @UseGuards(new RoleGuard(['student', 'teacher', 'super-admin']))
   @Get(':id')
   async getQuestion(@Param('id') id: string) {
     return this.questionService.getQuestion(id);

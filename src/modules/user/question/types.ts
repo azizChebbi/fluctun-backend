@@ -8,4 +8,6 @@ export type QuestionQueryParams = {
   dateOrder?: 'asc' | 'desc';
   startDate?: string;
   endDate?: string;
+  page?: number;
+  teachers?: string[];
 };
