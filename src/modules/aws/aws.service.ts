@@ -36,8 +36,8 @@ export class AwsService {
 
   getS3() {
     return new S3({
-      accessKeyId: 'AKIAVZ33D4ROCETW3UT3',
-      secretAccessKey: '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',
+      accessKeyId: '******',
+      secretAccessKey: '******',
     });
   }
 }
